@@ -166,14 +166,6 @@ RECEIVER_PRIVATE_KEY=
 >
 > You’ll get a fresh **private key** and **address** for `.env`.
 
-### `foundry.toml` RPC aliases (example)
-
-```toml
-[rpc_endpoints]
-eth_mainnet_sandbox = "${ETH_MAINNET_SANDBOX}"
-pol_mainnet_sandbox = "${POL_MAINNET_SANDBOX}"
-```
-
 ---
 
 ## Install & Build
@@ -184,7 +176,7 @@ Make sure your **Makefile** includes:
 .PHONY: make-deploy
 
 install:
-\tforge install && npm i && forge build
+    forge install && npm i && forge build
 ```
 
 Run:
@@ -203,20 +195,20 @@ Your Makefile targets (keep as provided):
 
 ```Makefile
 deploy-mainnet-sourcify:
-\tforge script script/DeployBridge.s.sol \
-\t --rpc-url eth_mainnet_sandbox \
-\t --verifier sourcify \
-\t --verify \
-\t --verifier-url https://rpc.buildbear.io/verify/sourcify/server/eth-to-pol \
-\t --broadcast \
+    forge script script/DeployBridge.s.sol \
+    --rpc-url eth_mainnet_sandbox \
+    --verifier sourcify \
+    --verify \
+    --verifier-url https://rpc.buildbear.io/verify/sourcify/server/eth-to-pol \
+    --broadcast \
 
 deploy-pol-sourcify:
-\tforge script script/DeployBridge.s.sol \
-\t --rpc-url pol_mainnet_sandbox \
-\t --verifier sourcify \
-\t --verify \
-\t --verifier-url https://rpc.buildbear.io/verify/sourcify/server/pol-to-eth \
-\t --broadcast \
+    forge script script/DeployBridge.s.sol \
+    --rpc-url pol_mainnet_sandbox \
+    --verifier sourcify \
+    --verify \
+    --verifier-url https://rpc.buildbear.io/verify/sourcify/server/pol-to-eth \
+    --broadcast \
 ```
 
 **Pre-funding check (in `DeployBridge.s.sol`):**
@@ -232,14 +224,14 @@ Make targets:
 
 ```Makefile
 interact-mainnet-bridge:
-\tforge script script/InteractBridge.s.sol \
-\t --rpc-url eth_mainnet_sandbox \
-\t --broadcast \
+    forge script script/InteractBridge.s.sol \
+    --rpc-url eth_mainnet_sandbox \
+    --broadcast \
 
 interact-pol-bridge:
-\tforge script script/InteractBridge.s.sol \
-\t --rpc-url pol_mainnet_sandbox \
-\t --broadcast \
+    forge script script/InteractBridge.s.sol \
+    --rpc-url pol_mainnet_sandbox \
+    --broadcast \
 ```
 
 > If your file still points `interact-pol-bridge` at the ETH RPC, switch it to `pol_mainnet_sandbox` as above.
@@ -283,32 +275,17 @@ This flow will:
 
 ## Relayer
 
-`package.json` (example):
-
-```json
-{
-  "scripts": {
-    "relayer": "tsx relayer/index.ts"
-  },
-  "dependencies": {
-    "dotenv": "^16.4.5",
-    "ethers": "^6.12.0",
-    "tsx": "^4.16.2"
-  }
-}
-```
-
-Run:
+To run the relayer, run:
 
 ```bash
-npm run relayer
+npm start
 ```
 
 Relayer behavior:
 
 - Reads latest ETH/POL bridge addresses from `broadcast/*/run-latest.json`.
 - Subscribes/polls for `BridgeRequested` on ETH sandbox.
-- Maps tokens (using `TOKEN_MAP`) and calls `release()` on POL sandbox with the **admin** key.
+- Maps tokens (using a token mapping) and calls `release()` on POL sandbox with the **admin** key.
 
 Expected console:
 
@@ -325,14 +302,15 @@ Release confirmed.
 
 ## Debugging & Verification in BuildBear
 
-- **Sourcify plugin**: Contracts are verified automatically using the configured `--verifier-url`. You can browse verified source in the sandbox explorer.
+- **Sourcify plugin**: Contracts are verified automatically using the configured command in `Makefile`. You can browse verified source in the sandbox explorer.
 - **Sentio plugin**: Open your sandbox’s Sentio view to:
 
-  - Trace `lockAndQuote` and `release`
+  - Trace transactions and fund-flows
+  - Trace call flows across functions and across contracts
   - Inspect token transfers and event logs
   - Confirm nonce usage and balances
 
-> This is where BuildBear shines: **click into traces and logs** for a mainnet-like flow, no mocks, no guesswork.
+> This is where BuildBear shines: **click into traces and logs** and build in an environment that resembles mainnet closely, no mocks, no guess-work.
 
 ---
 
@@ -374,6 +352,7 @@ This is a **trusted** bridge built for educational purposes:
 
 **Ideas to extend:**
 
+- Router like structure to deploy token-pairs for bridges and allow same chain/multi-chain swap from the bridge
 - Threshold/multi-sig relayers or optimistic verification.
 - Per-pair fees, slippage guards, and liquidity accounting.
 - Support more tokens and feeds; price oracles per token.
