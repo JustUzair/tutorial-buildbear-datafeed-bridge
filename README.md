@@ -2,9 +2,9 @@
 
 ## Abstract
 
-This project is a **naive but complete educational bridge** that simulates **mainnet-like behavior** end-to-end using **BuildBear’s Mainnet Sandboxes**:
+This project is a **naive but complete educational bridge** that provides **mainnet-like behavior** end-to-end using **BuildBear’s Mainnet Sandboxes**:
 
-- You’ll spin up **two BuildBear sandboxes**—one mirroring **Ethereum mainnet**, another mirroring **Polygon mainnet**.
+- You’ll spin up **two BuildBear sandboxes**, one forked from **Ethereum Mainnet**, another forked from **Polygon Mainnet**.
 - Each sandbox installs the **BuildBear Data Feeds plugin**, then you attach the **WETH/USD Chainlink feed** (same addresses as mainnet).
 - Contracts are **verified via Sourcify** (BuildBear Sourcify plugin), and transactions can be **inspected with Sentio** (BuildBear Sentio plugin) to see exactly what happens under the hood.
 - A **relayer** watches events on one chain and triggers releases on the other.
@@ -252,6 +252,35 @@ What happens:
 
 ---
 
+## Deploy & Interact End-to-End
+
+Once everything is set up:
+
+```bash
+# 1. Deploy both bridges (ETH + POL sandboxes)
+make deploy-mainnet-sourcify deploy-pol-sourcify
+
+# 2. Start the relayer (listens for BridgeRequested events)
+npm start
+
+# 3. Interact with the ETH sandbox bridge (locks tokens, emits event)
+make interact-mainnet-bridge
+```
+
+This flow will:
+
+1. Deploy bridges to both **ETH** and **Polygon** sandboxes with Sourcify verification.
+2. Run the **relayer**, which listens for `BridgeRequested` events on the ETH sandbox.
+3. Call `lockAndQuote` from your receiver wallet, which triggers the relayer to release mapped tokens on the Polygon sandbox.
+
+> ⚠️ **Important Note**
+> The relayer is a simple script that only processes events **while it is running**.
+>
+> - If you call `lockAndQuote` **while the relayer is offline**, that event will not be picked up later.
+> - For this demo bridge, you must have the relayer running to process new transactions.
+
+---
+
 ## Relayer
 
 `package.json` (example):
@@ -303,7 +332,7 @@ Release confirmed.
   - Inspect token transfers and event logs
   - Confirm nonce usage and balances
 
-> This is where BuildBear shines: **click into traces and logs** for a mainnet-like flow—no mocks, no guesswork.
+> This is where BuildBear shines: **click into traces and logs** for a mainnet-like flow, no mocks, no guesswork.
 
 ---
 
