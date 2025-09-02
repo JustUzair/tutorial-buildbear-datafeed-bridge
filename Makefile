@@ -1,5 +1,7 @@
 .PHONY: make-deploy
 
+install:
+	forge install && npm i && forge build
 deploy-mainnet-sourcify:
 	forge script script/DeployBridge.s.sol \
 	 --rpc-url eth_mainnet_sandbox \

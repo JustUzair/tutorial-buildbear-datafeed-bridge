@@ -2,13 +2,10 @@
 src = "src"
 out = "out"
 libs = ["lib"]
-fs_permissions=[
+fs_permissions = [{ access = "read", path = "./broadcast/DeployBridge.s.sol/" }]
 
-{ access = "read", path = "./broadcast/DeployBridge.s.sol/" },
-]
-
-remappings=['@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts']
+remappings = ['@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts']
 
 [rpc_endpoints]
-eth_mainnet_sandbox = "${ETH_MAINNET_SANDBOX}" 
-pol_mainnet_sandbox = "${POL_MAINNET_SANDBOX}" 
+eth_mainnet_sandbox = "${ETH_MAINNET_SANDBOX}"
+pol_mainnet_sandbox = "${POL_MAINNET_SANDBOX}"
