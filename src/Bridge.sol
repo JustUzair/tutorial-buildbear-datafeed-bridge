@@ -59,24 +59,24 @@ contract Bridge {
         return price; // 1e8
     }
 
-    function lockAndQuote(address srcToken, address dstToken, uint256 srcAmount, address to) external {
-        IERC20(srcToken).safeTransferFrom(msg.sender, address(this), srcAmount);
+    function lockAndQuote(address srcFromToken, address srcToToken, uint256 srcAmount, address to) external {
+        IERC20(srcFromToken).safeTransferFrom(msg.sender, address(this), srcAmount);
 
         uint256 dstAmount;
 
         uint256 wethPrice = _getWethPrice(); // 1e8
 
-        if (srcToken == wethToken && dstToken == usdtToken) {
+        if (srcFromToken == wethToken && srcToToken == usdtToken) {
             // WETH → USDT
             dstAmount = (srcAmount * wethPrice) / 1e8 / 1e12; // adjust 18→6 decimals
-        } else if (srcToken == usdtToken && dstToken == wethToken) {
+        } else if (srcFromToken == usdtToken && srcToToken == wethToken) {
             // USDT → WETH
             dstAmount = (srcAmount * 1e12 * 1e8) / wethPrice; // adjust 6→18 decimals
         } else {
             revert("unsupported token pair");
         }
 
-        emit BridgeRequested(msg.sender, to, srcToken, dstToken, srcAmount, dstAmount, nonce, block.timestamp);
+        emit BridgeRequested(msg.sender, to, srcFromToken, srcToToken, srcAmount, dstAmount, nonce, block.timestamp);
         nonce++;
     }
 
