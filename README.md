@@ -49,19 +49,20 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    A[lockAndQuote] --> B[IERC20(src).safeTransferFrom(msg.sender, this, srcAmount)]
-    B --> C[_getWethPrice() via AggregatorV3 (Data Feeds)]
-    C --> D{Pair?}
-    D -->|WETH->USDT| E[dst = src * price(1e8) / 1e8 / 1e12]
-    D -->|USDT->WETH| F[dst = src * 1e12 * 1e8 / price(1e8)]
-    E --> G[emit BridgeRequested(..., dst, nonce, now)]
+    A[lockAndQuote] --> B[Transfer tokens in - SafeERC20]
+    B --> C[Get WETH price from AggregatorV3 - Data Feeds]
+    C --> D{Token pair?}
+    D -->|WETH → USDT| E[dst = src * price / 1e8 / 1e12]
+    D -->|USDT → WETH| F[dst = src * 1e12 * 1e8 / price]
+    E --> G[Emit BridgeRequested event]
     F --> G
-    G --> H[nonce++]
+    G --> H[Increment nonce]
 
-    I[release] --> J[require(!processedNonces[extNonce])]
-    J --> K[processedNonces[extNonce] = true]
-    K --> L[IERC20(token).safeTransfer(to, amount)]
-    L --> M[emit TransferReleased(to, token, amount, extNonce, now)]
+    I[release] --> J[Check nonce not processed]
+    J --> K[Mark nonce as processed]
+    K --> L[Transfer tokens out]
+    L --> M[Emit TransferReleased event]
+
 ```
 
 **Notes:**
